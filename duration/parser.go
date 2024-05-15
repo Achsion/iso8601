@@ -52,11 +52,9 @@ func ParseToDuration(durationString string) (time.Duration, error) {
 		t += calcSubDuration(minuteStr, time.Minute)
 	}
 	if secondStr, ok := matches[secondsPatternKey]; ok {
-		seconds, err := strconv.ParseFloat(secondStr, 64)
-		// ignore error, as the regex ensures that the string is a valid number
-		if err == nil {
-			t += time.Duration(seconds * float64(time.Second))
-		}
+		seconds, _ := strconv.ParseFloat(secondStr, 64)
+		// ignore error, as the regex ensures that the string is a valid float
+		t += time.Duration(seconds * float64(time.Second))
 	}
 
 	return t, nil
@@ -65,7 +63,7 @@ func ParseToDuration(durationString string) (time.Duration, error) {
 func calcSubDuration(subStr string, durationMultiplier time.Duration) time.Duration {
 	val, err := strconv.Atoi(subStr)
 	if err != nil {
-		// ignore error, as the regex ensures that the string is a valid number
+		// ignore error, as the regex ensures that the string is a valid int
 		return 0
 	}
 
