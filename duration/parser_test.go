@@ -54,6 +54,14 @@ func TestParseToDuration(t *testing.T) {
 			expected: 1*time.Second + 2*time.Millisecond + 300*time.Microsecond,
 		},
 		{
+			isoStr:   "P1Y2M3DT4H5M6S",
+			expected: 1*duration.Year + 2*duration.Month + 3*duration.Day + 4*time.Hour + 5*time.Minute + 6*time.Second,
+		},
+		{
+			isoStr:   "P1Y2M3DT4H5M6.7S",
+			expected: 1*duration.Year + 2*duration.Month + 3*duration.Day + 4*time.Hour + 5*time.Minute + 6*time.Second + 70*time.Millisecond,
+		},
+		{
 			isoStr:   "P12Y32M153DT7H15M6.7023S",
 			expected: 12*duration.Year + 32*duration.Month + 153*duration.Day + 7*time.Hour + 15*time.Minute + 6*time.Second + 702*time.Millisecond + 300*time.Microsecond,
 		},
@@ -80,4 +88,42 @@ func TestParseToDuration(t *testing.T) {
 	}
 }
 
-//TODO: invalid input cases
+func TestParseToDurationError(t *testing.T) {
+	testCases := []struct {
+		name   string
+		isoStr string
+	}{
+		{
+			name:   "missing 'P' prefix",
+			isoStr: "1Y2M3DT4H5M6S",
+		},
+		{
+			name:   "not a duration",
+			isoStr: "abc",
+		},
+		{
+			name:   "invalid designator 'G'",
+			isoStr: "P40G1D",
+		},
+		{
+			name:   "wrong order of designators",
+			isoStr: "PT5M4H6S",
+		},
+		{
+			name:   "string with prefix",
+			isoStr: " P7Y3M4D",
+		},
+		{
+			name:   "string with suffix",
+			isoStr: "P7Y3M4D ",
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			dur, err := duration.ParseToDuration(test.isoStr)
+			require.Empty(t, dur)
+			assert.Error(t, err, dur)
+		})
+	}
+}
