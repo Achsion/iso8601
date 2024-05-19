@@ -59,7 +59,7 @@ func TestParseToDuration(t *testing.T) {
 		},
 		{
 			isoStr:   "P1Y2M3DT4H5M6.7S",
-			expected: 1*duration.Year + 2*duration.Month + 3*duration.Day + 4*time.Hour + 5*time.Minute + 6*time.Second + 70*time.Millisecond,
+			expected: 1*duration.Year + 2*duration.Month + 3*duration.Day + 4*time.Hour + 5*time.Minute + 6*time.Second + 700*time.Millisecond,
 		},
 		{
 			isoStr:   "P12Y32M153DT7H15M6.7023S",
