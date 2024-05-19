@@ -15,15 +15,15 @@ func TestParseToDuration(t *testing.T) {
 	}{
 		{
 			isoStr:   "P1Y",
-			expected: 1 * duration.Year,
+			expected: 1 * duration.TimeYear,
 		},
 		{
 			isoStr:   "P1M",
-			expected: 1 * duration.Month,
+			expected: 1 * duration.TimeMonth,
 		},
 		{
 			isoStr:   "P1D",
-			expected: 1 * duration.Day,
+			expected: 1 * duration.TimeDay,
 		},
 		{
 			isoStr:   "PT1H",
@@ -55,19 +55,19 @@ func TestParseToDuration(t *testing.T) {
 		},
 		{
 			isoStr:   "P1Y2M3DT4H5M6S",
-			expected: 1*duration.Year + 2*duration.Month + 3*duration.Day + 4*time.Hour + 5*time.Minute + 6*time.Second,
+			expected: 1*duration.TimeYear + 2*duration.TimeMonth + 3*duration.TimeDay + 4*time.Hour + 5*time.Minute + 6*time.Second,
 		},
 		{
 			isoStr:   "P1Y2M3DT4H5M6.7S",
-			expected: 1*duration.Year + 2*duration.Month + 3*duration.Day + 4*time.Hour + 5*time.Minute + 6*time.Second + 700*time.Millisecond,
+			expected: 1*duration.TimeYear + 2*duration.TimeMonth + 3*duration.TimeDay + 4*time.Hour + 5*time.Minute + 6*time.Second + 700*time.Millisecond,
 		},
 		{
 			isoStr:   "P12Y32M153DT7H15M6.7023S",
-			expected: 12*duration.Year + 32*duration.Month + 153*duration.Day + 7*time.Hour + 15*time.Minute + 6*time.Second + 702*time.Millisecond + 300*time.Microsecond,
+			expected: 12*duration.TimeYear + 32*duration.TimeMonth + 153*duration.TimeDay + 7*time.Hour + 15*time.Minute + 6*time.Second + 702*time.Millisecond + 300*time.Microsecond,
 		},
 		{
 			isoStr:   "P7Y3M4D",
-			expected: 7*duration.Year + 3*duration.Month + 4*duration.Day,
+			expected: 7*duration.TimeYear + 3*duration.TimeMonth + 4*duration.TimeDay,
 		},
 		{
 			isoStr:   "PT40H5M1.0103S",
@@ -75,7 +75,7 @@ func TestParseToDuration(t *testing.T) {
 		},
 		{
 			isoStr:   "P7Y6DT5M",
-			expected: 7*duration.Year + 6*duration.Day + 5*time.Minute,
+			expected: 7*duration.TimeYear + 6*duration.TimeDay + 5*time.Minute,
 		},
 	}
 
