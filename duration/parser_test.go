@@ -102,7 +102,15 @@ func TestParseToDurationError(t *testing.T) {
 			isoStr: "abc",
 		},
 		{
-			name:   "invalid designator 'G'",
+			name:   "invalid designator 'G' as last designator",
+			isoStr: "P1Y2M4D1G",
+		},
+		{
+			name:   "invalid designator 'G' in the middle",
+			isoStr: "P1Y2M40G1D",
+		},
+		{
+			name:   "invalid designator 'G' as first designator",
 			isoStr: "P40G1D",
 		},
 		{
@@ -116,6 +124,18 @@ func TestParseToDurationError(t *testing.T) {
 		{
 			name:   "string with suffix",
 			isoStr: "P7Y3M4D ",
+		},
+		{
+			name:   "string with number prefix",
+			isoStr: "1P7Y3M4D",
+		},
+		{
+			name:   "string with number suffix",
+			isoStr: "P7Y3M4D1",
+		},
+		{
+			name:   "double designator",
+			isoStr: "P1Y2M3DT4H3H5M6S",
 		},
 	}
 
