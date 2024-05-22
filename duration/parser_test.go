@@ -147,3 +147,10 @@ func TestParseToDurationError(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkParseToDuration(b *testing.B) {
+	x := "P12Y32M153DT7H15M6.7023S"
+	for i := 0; i < b.N; i++ {
+		_, _ = duration.ParseToDuration(x)
+	}
+}
