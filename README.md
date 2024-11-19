@@ -69,6 +69,7 @@ goarch: amd64
 pkg: github.com/Achsion/iso8601/duration
 cpu: AMD Ryzen 7 PRO 5875U with Radeon Graphics     
 BenchmarkParseToDuration-16    	13843465	        85.54 ns/op	       0 B/op	       0 allocs/op
+```
 
 ### `v0.1.0`
 ```text
