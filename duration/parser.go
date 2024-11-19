@@ -124,11 +124,17 @@ func calculateDuration(durationParts []string) time.Duration {
 		t += time.Minute * time.Duration(nrVal)
 	}
 	if durationParts[secondIdx-idxLookupShift] != "" {
-		nrVal, _ = strconv.Atoi(durationParts[secondIdx-idxLookupShift])
+		lesserSecsStr := durationParts[secondIdx-idxLookupShift]
+		decimalPoints := len(lesserSecsStr)
+		if decimalPoints > 9 {
+			lesserSecsStr = lesserSecsStr[:9]
+			decimalPoints = 9
+		}
+		nrVal, _ = strconv.Atoi(lesserSecsStr)
 
 		if durationParts[secondSepIdx-idxLookupShift] != "" {
 			sVal, _ := strconv.Atoi(durationParts[secondSepIdx-idxLookupShift])
-			t += time.Second*time.Duration(sVal) + calculateLesserSecondsDuration(nrVal, len(durationParts[secondIdx-idxLookupShift]))
+			t += time.Second*time.Duration(sVal) + calculateLesserSecondsDuration(nrVal, decimalPoints)
 		} else {
 			t += time.Second * time.Duration(nrVal)
 		}
