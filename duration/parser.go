@@ -2,7 +2,6 @@ package duration
 
 import (
 	"fmt"
-	"math"
 	"strconv"
 	"time"
 	"unicode"
@@ -43,6 +42,11 @@ var timeLookup = map[int32]int{
 	'M': minuteIdx,
 	'.': secondSepIdx,
 	'S': secondIdx,
+}
+
+// decimalPointMultiplier stores the pre-computed multiplier used for decimal points calculation
+var decimalPointMultiplier = [...]time.Duration{
+	1e09, 1e08, 1e07, 1e06, 1e05, 1e04, 1e03, 1e02, 1e01, 1e00,
 }
 
 var invalidFormatErr = fmt.Errorf("invalid iso8601 duration format")
@@ -143,12 +147,10 @@ func calculateDuration(durationParts []string) time.Duration {
 	return t
 }
 
-func calculateLesserSecondsDuration(lesserSeconds int, originalLength int) time.Duration {
+func calculateLesserSecondsDuration(lesserSeconds int, multiplyIdx int) time.Duration {
 	if lesserSeconds == 0 {
 		return 0
 	}
 
-	multiplier := time.Second / time.Duration(math.Pow10(originalLength))
-
-	return time.Duration(lesserSeconds) * multiplier
+	return time.Duration(lesserSeconds) * decimalPointMultiplier[multiplyIdx]
 }
