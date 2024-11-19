@@ -104,53 +104,53 @@ func ParseToDuration(durationString string) (time.Duration, error) {
 }
 
 func calculateDuration(durationParts []string) time.Duration {
-	var t time.Duration
+	var resultDur time.Duration
 	var nrVal int
 
 	if durationParts[yearIdx-idxLookupShift] != "" {
 		nrVal, _ = strconv.Atoi(durationParts[yearIdx-idxLookupShift])
-		t += TimeYear * time.Duration(nrVal)
+		resultDur += TimeYear * time.Duration(nrVal)
 	}
 	if durationParts[monthIdx-idxLookupShift] != "" {
 		nrVal, _ = strconv.Atoi(durationParts[monthIdx-idxLookupShift])
-		t += TimeMonth * time.Duration(nrVal)
+		resultDur += TimeMonth * time.Duration(nrVal)
 	}
 	if durationParts[dayIdx-idxLookupShift] != "" {
 		nrVal, _ = strconv.Atoi(durationParts[dayIdx-idxLookupShift])
-		t += TimeDay * time.Duration(nrVal)
+		resultDur += TimeDay * time.Duration(nrVal)
 	}
 	if durationParts[hourIdx-idxLookupShift] != "" {
 		nrVal, _ = strconv.Atoi(durationParts[hourIdx-idxLookupShift])
-		t += time.Hour * time.Duration(nrVal)
+		resultDur += time.Hour * time.Duration(nrVal)
 	}
 	if durationParts[minuteIdx-idxLookupShift] != "" {
 		nrVal, _ = strconv.Atoi(durationParts[minuteIdx-idxLookupShift])
-		t += time.Minute * time.Duration(nrVal)
+		resultDur += time.Minute * time.Duration(nrVal)
 	}
 	if durationParts[secondIdx-idxLookupShift] != "" {
-		lesserSecsStr := durationParts[secondIdx-idxLookupShift]
-		decimalPoints := len(lesserSecsStr)
+		decimalSecsStr := durationParts[secondIdx-idxLookupShift]
+		decimalPoints := len(decimalSecsStr)
 		if decimalPoints > 9 {
-			lesserSecsStr = lesserSecsStr[:9]
+			decimalSecsStr = decimalSecsStr[:9]
 			decimalPoints = 9
 		}
-		nrVal, _ = strconv.Atoi(lesserSecsStr)
+		nrVal, _ = strconv.Atoi(decimalSecsStr)
 
 		if durationParts[secondSepIdx-idxLookupShift] != "" {
 			sVal, _ := strconv.Atoi(durationParts[secondSepIdx-idxLookupShift])
-			t += time.Second*time.Duration(sVal) + calculateLesserSecondsDuration(nrVal, decimalPoints)
+			resultDur += time.Second*time.Duration(sVal) + calculateDecimalSecondsDuration(nrVal, decimalPoints)
 		} else {
-			t += time.Second * time.Duration(nrVal)
+			resultDur += time.Second * time.Duration(nrVal)
 		}
 	}
 
-	return t
+	return resultDur
 }
 
-func calculateLesserSecondsDuration(lesserSeconds int, multiplyIdx int) time.Duration {
-	if lesserSeconds == 0 {
+func calculateDecimalSecondsDuration(decimalSeconds int, multiplyIdx int) time.Duration {
+	if decimalSeconds == 0 {
 		return 0
 	}
 
-	return time.Duration(lesserSeconds) * decimalPointMultiplier[multiplyIdx]
+	return time.Duration(decimalSeconds) * decimalPointMultiplier[multiplyIdx]
 }
