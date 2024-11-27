@@ -74,7 +74,7 @@ func TestParseToDuration(t *testing.T) {
 			expected: 40*time.Hour + 5*time.Minute + 1*time.Second + 10*time.Millisecond + 300*time.Microsecond,
 		},
 		{
-			isoStr:   "PT1.23456789123S",
+			isoStr:   "PT1.23456789123S", // Too many decimal points, the last '23' will be cut/removed/ignored.
 			expected: 1*time.Second + 234*time.Millisecond + 567*time.Microsecond + 891*time.Nanosecond,
 		},
 		{
