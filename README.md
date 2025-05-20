@@ -5,7 +5,7 @@
 
 The current go native `time.ParseDuration()` does not support any ISO8601 duration strings.
 
-This library parses any ISO8601 duration string into a native Go `time.Duration` object.
+This library parses any ISO8601-1 duration string into a native Go `time.Duration` object.
 
 ## Should I use this?
 
@@ -47,8 +47,21 @@ func main() {
 
 Benchmarks created with
 ```bash
-go test -bench=. -benchmem ./duration
+go test -bench=. -benchmem ./...
 ```
+
+### `v1.1.0`
+```text
+goos: linux
+goarch: amd64
+pkg: github.com/Achsion/iso8601/duration
+cpu: AMD Ryzen 7 PRO 5875U with Radeon Graphics     
+BenchmarkFormatQuick-16        	17331862	        69.89 ns/op	      20 B/op	       2 allocs/op
+BenchmarkParseToDuration-16    	12591764	        87.91 ns/op	       0 B/op	       0 allocs/op
+```
+
+<details>
+  <summary>Older versions</summary>
 
 ### `v1.0.1`
 ```text
@@ -58,9 +71,6 @@ pkg: github.com/Achsion/iso8601/duration
 cpu: AMD Ryzen 7 PRO 5875U with Radeon Graphics     
 BenchmarkParseToDuration-16    	13721776	        86.28 ns/op	       0 B/op	       0 allocs/op
 ```
-
-<details>
-  <summary>Older versions</summary>
 
 ### `v1.0.0`
 ```text
