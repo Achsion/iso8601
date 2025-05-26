@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func TestFormatQuick(t *testing.T) {
+func TestFormatSeconds(t *testing.T) {
 	testCases := []struct {
 		in       time.Duration
 		expected string
@@ -41,6 +41,10 @@ func TestFormatQuick(t *testing.T) {
 			expected: "PT10S",
 		},
 		{
+			in:       -3 * time.Second,
+			expected: "-PT3S",
+		},
+		{
 			in:       3 * time.Minute,
 			expected: "PT180S",
 		},
@@ -56,11 +60,19 @@ func TestFormatQuick(t *testing.T) {
 			in:       1*time.Hour + 2*time.Minute + 3*time.Second + 456*time.Millisecond,
 			expected: "PT3723.456S",
 		},
+		{
+			in:       time.Duration(-1 << 63), // min duration
+			expected: "-PT9223372036.854775808S",
+		},
+		{
+			in:       time.Duration(1<<63 - 1), // max duration
+			expected: "PT9223372036.854775807S",
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.expected, func(t *testing.T) {
-			actual := duration.FormatQuick(tc.in)
+			actual := duration.FormatSeconds(tc.in)
 			assert.Equal(t, tc.expected, actual)
 		})
 	}
@@ -110,7 +122,7 @@ func TestFormatQuick(t *testing.T) {
 //		{
 //			in:       1*time.Hour + 2*time.Minute + 3*time.Second + 456*time.Microsecond,
 //			expected: "PT1H2M3.456S",
-//		}, // TODO: also support negative duration values, as defined in ISO8601-2
+//		},
 //	}
 //
 //	for _, tc := range testCases {
@@ -121,9 +133,9 @@ func TestFormatQuick(t *testing.T) {
 //	}
 //}
 
-func BenchmarkFormatQuick(b *testing.B) {
+func BenchmarkFormatSeconds(b *testing.B) {
 	x := 1*time.Hour + 2*time.Minute + 3*time.Second + 456*time.Microsecond
 	for i := 0; i < b.N; i++ {
-		_ = duration.FormatQuick(x)
+		_ = duration.FormatSeconds(x)
 	}
 }
