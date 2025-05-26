@@ -1,11 +1,16 @@
-# iso8601 Duration parser
+# iso8601 Duration parser and formatter
 
 [![GoDoc](https://godoc.org/github.com/Achsion/iso8601?status.svg)](https://godoc.org/github.com/Achsion/iso8601)
 [![GoReport](https://goreportcard.com/badge/github.com/Achsion/iso8601)](https://goreportcard.com/report/github.com/Achsion/iso8601) 
 
-The current go native `time.ParseDuration()` does not support any ISO8601 duration strings.
+The current go native `time` pkg does not support any ISO8601 duration strings.
 
-This library parses any ISO8601-1 duration string into a native Go `time.Duration` object.
+This library provides the functionality to parse and format a native Go `time.Duration` to and from an ISO 8601 duration string.
+
+## What ISO8601 duration strings are supported?
+
+Currently, parsing only supports ISO 8601-1.  
+However, formatting a Duration into a string already supports negative durations and the ISO 8601-2 extension.
 
 ## Should I use this?
 
