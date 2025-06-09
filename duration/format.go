@@ -4,29 +4,23 @@ import (
 	"time"
 )
 
-// FormatQuick
-// Deprecated: use FormatSeconds instead.
-func FormatQuick(duration time.Duration) string {
-	return FormatSeconds(duration)
-}
-
-// FormatSeconds returns a string representing the duration in the ISO8601 format, but only
-// in seconds, e.g. "PT345.15s". Leading zero units are omitted.
-// The result counts as a valid ISO8601 duration. It is faster to format than using the 'full'
-// duration format, just not as readable.
+// Format returns a string representing the duration in the ISO8601 format, but only
+// with the hours being the highest time element, e.g. "PT44H7M3.15s". Leading zero units are omitted.
+// The result counts as a valid ISO8601 duration.
 // It supports negative durations, as detailed in the extension ISO8601-2.
-func FormatSeconds(duration time.Duration) string {
+func Format(duration time.Duration) string {
 	// This is inlinable to take advantage of "function outlining".
 	// Thus, the caller can decide whether a string must be heap allocated.
-	var arr [24]byte
-	n := format(duration, &arr)
-	return string(arr[n:])
+	var arr [27]byte
+	bufWriteIdx := format(duration, &arr)
+
+	return string(arr[bufWriteIdx:])
 }
 
-// format formats the representation of d into the end of buf and
+// format formats the ISO8601 string representation of duration into the end of outBuf and
 // returns the offset of the first character.
-func format(duration time.Duration, outBuf *[24]byte) int {
-	// Largest possible string: '-PT9223372036.854775808S'
+func format(duration time.Duration, outBuf *[27]byte) int {
+	// Largest possible string: '-PT2562047H47M16.854775808S' -> 27 chars
 	bufWriteIdx := len(outBuf)
 	isNegative := duration < 0
 
@@ -37,11 +31,25 @@ func format(duration time.Duration, outBuf *[24]byte) int {
 
 	bufWriteIdx--
 	outBuf[bufWriteIdx] = 'S'
-
 	bufWriteIdx, durVal = fmtFraction(outBuf[:bufWriteIdx], durVal, 9)
-
 	// durVal is now integer seconds
-	bufWriteIdx = fmtInt(outBuf[:bufWriteIdx], durVal)
+
+	bufWriteIdx = fmtInt(outBuf[:bufWriteIdx], durVal%60)
+	durVal /= 60 // durVal is now integer minutes
+
+	if durVal > 0 {
+		bufWriteIdx--
+		outBuf[bufWriteIdx] = 'M'
+		bufWriteIdx = fmtInt(outBuf[:bufWriteIdx], durVal%60)
+		durVal /= 60 // durVal is now integer hours
+
+		if durVal > 0 {
+			bufWriteIdx--
+			outBuf[bufWriteIdx] = 'H'
+			bufWriteIdx = fmtInt(outBuf[:bufWriteIdx], durVal)
+			// stop at hours because days can be different lengths
+		}
+	}
 
 	bufWriteIdx--
 	outBuf[bufWriteIdx] = 'T'
@@ -104,6 +112,62 @@ func fmtInt(buf []byte, value uint64) int {
 		bufWriteIdx--
 		buf[bufWriteIdx] = byte(value%10) + '0'
 		value /= 10
+	}
+
+	return bufWriteIdx
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Deprecated:       ////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// FormatQuick
+// Deprecated: use FormatSeconds instead.
+func FormatQuick(duration time.Duration) string {
+	return FormatSeconds(duration)
+}
+
+// FormatSeconds returns a string representing the duration in the ISO8601 format, but only
+// in seconds, e.g. "PT345.15s". Leading zero units are omitted.
+// The result counts as a valid ISO8601 duration.
+// It supports negative durations, as detailed in the extension ISO8601-2.
+// Deprecated: it is not significantly faster than Format, so it will be replaced by it later.
+func FormatSeconds(duration time.Duration) string {
+	// This is inlinable to take advantage of "function outlining".
+	// Thus, the caller can decide whether a string must be heap allocated.
+	var arr [24]byte
+	bufWriteIdx := formatSeconds(duration, &arr)
+
+	return string(arr[bufWriteIdx:])
+}
+
+// formatSeconds formats the representation of d into the end of buf and
+// returns the offset of the first character.
+// Deprecated: only used for FormatSeconds and needs to be removed soon.
+func formatSeconds(duration time.Duration, outBuf *[24]byte) int {
+	// Largest possible string: '-PT9223372036.854775808S' -> 24 chars
+	bufWriteIdx := len(outBuf)
+	isNegative := duration < 0
+
+	durVal := uint64(duration)
+	if isNegative {
+		durVal = -durVal
+	}
+
+	bufWriteIdx--
+	outBuf[bufWriteIdx] = 'S'
+	bufWriteIdx, durVal = fmtFraction(outBuf[:bufWriteIdx], durVal, 9)
+	// durVal is now integer seconds
+
+	bufWriteIdx = fmtInt(outBuf[:bufWriteIdx], durVal)
+
+	bufWriteIdx--
+	outBuf[bufWriteIdx] = 'T'
+	bufWriteIdx--
+	outBuf[bufWriteIdx] = 'P'
+	if isNegative {
+		bufWriteIdx--
+		outBuf[bufWriteIdx] = '-'
 	}
 
 	return bufWriteIdx
