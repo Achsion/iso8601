@@ -26,6 +26,14 @@ func TestParseToDuration(t *testing.T) {
 			expected: 1 * duration.TimeDay,
 		},
 		{
+			isoStr:   "PT3H40M0S",
+			expected: 3*time.Hour + 40*time.Minute,
+		},
+		{
+			isoStr:   "-PT3H40M0S", // negative duration, as detailed in the extension ISO8601-2
+			expected: -3*time.Hour - 40*time.Minute,
+		},
+		{
 			isoStr:   "PT1H",
 			expected: 1 * time.Hour,
 		},

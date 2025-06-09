@@ -51,10 +51,22 @@ var decimalPointMultiplier = [...]time.Duration{
 
 var invalidFormatErr = fmt.Errorf("invalid iso8601 duration format")
 
-// ParseToDuration parses an ISO 8601 duration string into a time.Duration.
+// ParseToDuration parses an ISO8601 duration string into a time.Duration.
+// It accepts negative durations but only by prepending a '-' like: "[-]P<duration>".
 func ParseToDuration(durationString string) (time.Duration, error) {
-	if durationString[0] != startDesignator || len(durationString) < 3 {
-		// duration string has to start with 'P' and the shortest possible length is 3 (e.g. "P3D")
+	isNegative := false
+
+	// consume [-]?
+	if durationString != "" {
+		firstChar := durationString[0]
+		if firstChar == '-' {
+			isNegative = true
+			durationString = durationString[1:]
+		}
+	}
+
+	if len(durationString) < 3 || durationString[0] != startDesignator {
+		// duration string has to start with 'P' or '-P' and the shortest possible length is 3 (e.g. "P3D")
 		return 0, invalidFormatErr
 	}
 
@@ -100,10 +112,10 @@ func ParseToDuration(durationString string) (time.Duration, error) {
 		return 0, invalidFormatErr
 	}
 
-	return calculateDuration(durationParts), nil
+	return calculateDuration(durationParts, isNegative), nil
 }
 
-func calculateDuration(durationParts []string) time.Duration {
+func calculateDuration(durationParts []string, isNegative bool) time.Duration {
 	var resultDur time.Duration
 	var nrVal int
 
@@ -142,6 +154,10 @@ func calculateDuration(durationParts []string) time.Duration {
 		} else {
 			resultDur += time.Second * time.Duration(nrVal)
 		}
+	}
+
+	if isNegative {
+		resultDur = -resultDur
 	}
 
 	return resultDur
