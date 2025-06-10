@@ -51,7 +51,7 @@ var decimalPointMultiplier = [...]time.Duration{
 
 var invalidFormatErr = fmt.Errorf("invalid iso8601 duration format")
 
-// ParseToDuration parses an ISO8601 duration string into a time.Duration.
+// ParseToDuration parses an ISO 8601 duration string into a time.Duration.
 // It accepts negative durations but only by prepending a '-' like: "[-]P<duration>".
 func ParseToDuration(durationString string) (time.Duration, error) {
 	isNegative := false

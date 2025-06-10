@@ -4,10 +4,10 @@ import (
 	"time"
 )
 
-// Format returns a string representing the duration in the ISO8601 format, but only
+// Format returns a string representing the duration in the ISO 8601 format, but only
 // with the hours being the highest time element, e.g. "PT44H7M3.15s". Leading zero units are omitted.
 // The result counts as a valid ISO8601 duration.
-// It supports negative durations, as detailed in the extension ISO8601-2.
+// It supports negative durations, as detailed in the extension ISO 8601-2.
 func Format(duration time.Duration) string {
 	// This is inlinable to take advantage of "function outlining".
 	// Thus, the caller can decide whether a string must be heap allocated.

@@ -3,7 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/Achsion/iso8601?status.svg)](https://godoc.org/github.com/Achsion/iso8601)
 [![GoReport](https://goreportcard.com/badge/github.com/Achsion/iso8601)](https://goreportcard.com/report/github.com/Achsion/iso8601) 
 
-The current go native `time` pkg does not support any ISO8601 duration strings.
+The current go native `time` pkg does not support any ISO 8601 duration strings.
 
 This library provides the functionality to parse and format a native Go `time.Duration` to and from an ISO 8601 duration string.
 
