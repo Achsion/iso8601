@@ -1,7 +1,7 @@
-package duration_test
+package iso8601_test
 
 import (
-	"github.com/Achsion/iso8601/duration"
+	"github.com/Achsion/iso8601"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -15,15 +15,15 @@ func TestParseToDuration(t *testing.T) {
 	}{
 		{
 			isoStr:   "P1Y",
-			expected: 1 * duration.TimeYear,
+			expected: 1 * iso8601.TimeYear,
 		},
 		{
 			isoStr:   "P1M",
-			expected: 1 * duration.TimeMonth,
+			expected: 1 * iso8601.TimeMonth,
 		},
 		{
 			isoStr:   "P1D",
-			expected: 1 * duration.TimeDay,
+			expected: 1 * iso8601.TimeDay,
 		},
 		{
 			isoStr:   "PT3H40M0S",
@@ -63,19 +63,19 @@ func TestParseToDuration(t *testing.T) {
 		},
 		{
 			isoStr:   "P1Y2M3DT4H5M6S",
-			expected: 1*duration.TimeYear + 2*duration.TimeMonth + 3*duration.TimeDay + 4*time.Hour + 5*time.Minute + 6*time.Second,
+			expected: 1*iso8601.TimeYear + 2*iso8601.TimeMonth + 3*iso8601.TimeDay + 4*time.Hour + 5*time.Minute + 6*time.Second,
 		},
 		{
 			isoStr:   "P1Y2M3DT4H5M6.7S",
-			expected: 1*duration.TimeYear + 2*duration.TimeMonth + 3*duration.TimeDay + 4*time.Hour + 5*time.Minute + 6*time.Second + 700*time.Millisecond,
+			expected: 1*iso8601.TimeYear + 2*iso8601.TimeMonth + 3*iso8601.TimeDay + 4*time.Hour + 5*time.Minute + 6*time.Second + 700*time.Millisecond,
 		},
 		{
 			isoStr:   "P12Y32M153DT7H15M6.7023S",
-			expected: 12*duration.TimeYear + 32*duration.TimeMonth + 153*duration.TimeDay + 7*time.Hour + 15*time.Minute + 6*time.Second + 702*time.Millisecond + 300*time.Microsecond,
+			expected: 12*iso8601.TimeYear + 32*iso8601.TimeMonth + 153*iso8601.TimeDay + 7*time.Hour + 15*time.Minute + 6*time.Second + 702*time.Millisecond + 300*time.Microsecond,
 		},
 		{
 			isoStr:   "P7Y3M4D",
-			expected: 7*duration.TimeYear + 3*duration.TimeMonth + 4*duration.TimeDay,
+			expected: 7*iso8601.TimeYear + 3*iso8601.TimeMonth + 4*iso8601.TimeDay,
 		},
 		{
 			isoStr:   "PT40H5M1.0103S",
@@ -87,13 +87,13 @@ func TestParseToDuration(t *testing.T) {
 		},
 		{
 			isoStr:   "P7Y6DT5M",
-			expected: 7*duration.TimeYear + 6*duration.TimeDay + 5*time.Minute,
+			expected: 7*iso8601.TimeYear + 6*iso8601.TimeDay + 5*time.Minute,
 		},
 	}
 
 	for _, test := range testCases {
 		t.Run(test.isoStr, func(t *testing.T) {
-			dur, err := duration.ParseToDuration(test.isoStr)
+			dur, err := iso8601.ParseToDuration(test.isoStr)
 			require.NoError(t, err)
 			assert.Equal(t, test.expected, dur)
 		})
@@ -153,7 +153,7 @@ func TestParseToDurationError(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
-			dur, err := duration.ParseToDuration(test.isoStr)
+			dur, err := iso8601.ParseToDuration(test.isoStr)
 			require.Empty(t, dur)
 			assert.Error(t, err, dur)
 		})
@@ -163,6 +163,6 @@ func TestParseToDurationError(t *testing.T) {
 func BenchmarkParseToDuration(b *testing.B) {
 	x := "P12Y32M153DT7H15M6.7023S"
 	for i := 0; i < b.N; i++ {
-		_, _ = duration.ParseToDuration(x)
+		_, _ = iso8601.ParseToDuration(x)
 	}
 }

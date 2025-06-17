@@ -1,4 +1,4 @@
-package duration
+package iso8601
 
 import (
 	"fmt"
