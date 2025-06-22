@@ -91,6 +91,7 @@ func BenchmarkFormat(b *testing.B) {
 		{name: "one second", dur: 1 * time.Second},
 		{name: "1 nanosecond", dur: time.Nanosecond},
 		{name: "3h40m", dur: 3*time.Hour + 40*time.Minute},
+		{name: "-3h40m", dur: -3*time.Hour - 40*time.Minute},
 		{name: "1h2m3.456s", dur: 1*time.Hour + 2*time.Minute + 3*time.Second + 456*time.Microsecond},
 		{name: "large duration", dur: time.Duration(1<<63 - 1)},
 	}

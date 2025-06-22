@@ -17,9 +17,6 @@ const (
 const (
 	durationStringShift = 1
 	idxLookupShift      = 1
-
-	startDesignator      = 'P'
-	timeSwitchDesignator = 'T'
 )
 
 const (
@@ -33,15 +30,15 @@ const (
 )
 
 var dateLookup = map[int32]int{
-	'Y': yearIdx,
-	'M': monthIdx,
-	'D': dayIdx,
+	yearDesignator:  yearIdx,
+	monthDesignator: monthIdx,
+	dayDesignator:   dayIdx,
 }
 var timeLookup = map[int32]int{
-	'H': hourIdx,
-	'M': minuteIdx,
-	'.': secondSepIdx,
-	'S': secondIdx,
+	hourDesignator:   hourIdx,
+	minuteDesignator: minuteIdx,
+	'.':              secondSepIdx,
+	secondDesignator: secondIdx,
 }
 
 // decimalPointMultiplier stores the pre-computed multiplier used for decimal points calculation
