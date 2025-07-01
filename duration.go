@@ -2,6 +2,7 @@ package iso8601
 
 import (
 	"errors"
+	"math"
 	"strconv"
 	"time"
 )
@@ -103,10 +104,66 @@ func (d Duration) Seconds() float64 {
 //////////////////////////////////////////////////////////////////////////////////////////
 // Go std time stuff /////////////////////////////////////////////////////////////////////
 
-func (d Duration) AddToTime(stdTime time.Time) (time.Duration, error) {
-	// TODO: implement this
+func (d Duration) AddToTime(stdTime time.Time) (time.Time, error) {
+	multiplier := 1
+	if !d.isPositive {
+		multiplier = -1
+	}
 
-	return 0, errors.New("not implemented")
+	yearAdd, err := float64ToInt(d.years)
+	if err != nil {
+		return time.Time{}, errors.New("could not convert year to int")
+	}
+	monthAdd, err := float64ToInt(d.months)
+	if err != nil {
+		return time.Time{}, errors.New("could not convert month to int")
+	}
+	weekAdd, err := float64ToInt(d.weeks)
+	if err != nil {
+		return time.Time{}, errors.New("could not convert week to int")
+	}
+	dayAdd, err := float64ToInt(d.days)
+	if err != nil {
+		return time.Time{}, errors.New("could not convert day to int")
+	}
+	hourAdd, err := float64ToInt(d.hours)
+	if err != nil {
+		return time.Time{}, errors.New("could not convert hour to int")
+	}
+	minuteAdd, err := float64ToInt(d.minutes)
+	if err != nil {
+		return time.Time{}, errors.New("could not convert minute to int")
+	}
+	secondAdd, err := float64ToInt(d.seconds)
+	if err != nil {
+		// TODO: should support up to nanoseconds, but not for now
+		return time.Time{}, errors.New("could not convert second to int")
+	}
+
+	out := stdTime.AddDate(
+		multiplier*yearAdd,
+		multiplier*monthAdd,
+		multiplier*(weekAdd*7+dayAdd),
+	).Add(
+		time.Hour*time.Duration(hourAdd) +
+			time.Minute*time.Duration(minuteAdd) +
+			time.Second*time.Duration(secondAdd),
+	)
+
+	return out, nil
+}
+
+func float64ToInt(in float64) (int, error) {
+	intVal, fracVal := math.Modf(in)
+	if fracVal != 0.0 {
+		return 0, errors.New("float containing decimals not supported")
+	}
+
+	if intVal < math.MinInt || intVal > math.MaxInt {
+		return 0, errors.New("float int val exceeds integer capacity")
+	}
+
+	return int(intVal * 1), nil
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

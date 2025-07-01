@@ -232,6 +232,31 @@ func TestDurationFromTimeDuration(t *testing.T) {
 	}
 }
 
+func TestDuration_AddToTime_Success(t *testing.T) {
+	testCases := []struct {
+		name     string
+		dur      iso8601.Duration
+		stdTime  time.Time
+		expected time.Time
+	}{
+		{ //TODO: test more
+			name:     "first test",
+			dur:      newDurationT(t, true, 1, 1, 0, 1, 3, 3, 3),
+			stdTime:  time.Date(2003, 3, 3, 15, 15, 15, 0, time.UTC),
+			expected: time.Date(2004, 4, 4, 18, 18, 18, 0, time.UTC),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual, actualErr := tc.dur.AddToTime(tc.stdTime)
+			require.NoError(t, actualErr)
+
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
 func BenchmarkDuration_String(b *testing.B) {
 	cases := []struct {
 		name string
