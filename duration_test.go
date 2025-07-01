@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-// TODO: add comma numbers to every unit
-
 func newDurationT(
 	t *testing.T,
 	isPositive bool, years, months, weeks, days, hours, minutes, seconds float64,
@@ -31,8 +29,34 @@ func newDurationB(
 }
 
 func TestNewDuration_Error(t *testing.T) {
-	//TODO do this
-	assert.True(t, true)
+	t.Run("negative year", func(t *testing.T) {
+		_, err := iso8601.NewDuration(true, -1, 0, 0, 0, 0, 0, 0)
+		assert.Error(t, err)
+	})
+	t.Run("negative month", func(t *testing.T) {
+		_, err := iso8601.NewDuration(true, 0, -1, 0, 0, 0, 0, 0)
+		assert.Error(t, err)
+	})
+	t.Run("negative week", func(t *testing.T) {
+		_, err := iso8601.NewDuration(true, 0, 0, -1, 0, 0, 0, 0)
+		assert.Error(t, err)
+	})
+	t.Run("negative day", func(t *testing.T) {
+		_, err := iso8601.NewDuration(true, 0, 0, 0, -1, 0, 0, 0)
+		assert.Error(t, err)
+	})
+	t.Run("negative hour", func(t *testing.T) {
+		_, err := iso8601.NewDuration(true, 0, 0, 0, 0, -1, 0, 0)
+		assert.Error(t, err)
+	})
+	t.Run("negative minute", func(t *testing.T) {
+		_, err := iso8601.NewDuration(true, 0, 0, 0, 0, 0, -1, 0)
+		assert.Error(t, err)
+	})
+	t.Run("negative second", func(t *testing.T) {
+		_, err := iso8601.NewDuration(true, 0, 0, 0, 0, 0, 0, -1)
+		assert.Error(t, err)
+	})
 }
 
 func TestDuration_String(t *testing.T) {
@@ -87,9 +111,19 @@ func TestDuration_String(t *testing.T) {
 			expected:        "PT3M",
 		},
 		{
+			name:            "floating point minutes",
+			iso8601Duration: newDurationT(t, true, 0, 0, 0, 0, 0, 3.765, 0),
+			expected:        "PT3.765M",
+		},
+		{
 			name:            "hours",
 			iso8601Duration: newDurationT(t, true, 0, 0, 0, 0, 44, 0, 0),
 			expected:        "PT44H",
+		},
+		{
+			name:            "floating point hours",
+			iso8601Duration: newDurationT(t, true, 0, 0, 0, 0, 44.44, 0, 0),
+			expected:        "PT44.44H",
 		},
 		{
 			name:            "3 hours 40 minutes",
@@ -102,9 +136,19 @@ func TestDuration_String(t *testing.T) {
 			expected:        "P6D",
 		},
 		{
+			name:            "floating point days",
+			iso8601Duration: newDurationT(t, true, 0, 0, 0, 6.33, 0, 0, 0),
+			expected:        "P6.33D",
+		},
+		{
 			name:            "weeks",
 			iso8601Duration: newDurationT(t, true, 0, 0, 80, 0, 0, 0, 0),
 			expected:        "P80W",
+		},
+		{
+			name:            "floating point weeks",
+			iso8601Duration: newDurationT(t, true, 0, 0, 80.99, 0, 0, 0, 0),
+			expected:        "P80.99W",
 		},
 		{
 			name:            "months",
@@ -112,9 +156,19 @@ func TestDuration_String(t *testing.T) {
 			expected:        "P981M",
 		},
 		{
+			name:            "floating point months",
+			iso8601Duration: newDurationT(t, true, 0, 981.004, 0, 0, 0, 0, 0),
+			expected:        "P981.004M",
+		},
+		{
 			name:            "years",
 			iso8601Duration: newDurationT(t, true, 9, 0, 0, 0, 0, 0, 0),
 			expected:        "P9Y",
+		},
+		{
+			name:            "floating point years",
+			iso8601Duration: newDurationT(t, true, 9.12, 0, 0, 0, 0, 0, 0),
+			expected:        "P9.12Y",
 		},
 		{
 			name:            "one of everything",
@@ -185,6 +239,7 @@ func BenchmarkDuration_String(b *testing.B) {
 	}{
 		{name: "zero duration", dur: newDurationB(b, true, 0, 0, 0, 0, 0, 0, 0)},
 		{name: "one second", dur: newDurationB(b, true, 0, 0, 0, 0, 0, 0, 1)},
+		{name: "1.55 second", dur: newDurationB(b, true, 0, 0, 0, 0, 0, 0, 1.55)},
 		{name: "1 nanosecond", dur: newDurationB(b, true, 0, 0, 0, 0, 0, 0, 0.000000001)},
 		{name: "3h40m", dur: newDurationB(b, true, 0, 0, 0, 0, 3, 40, 0)},
 		{name: "-3h40m", dur: newDurationB(b, false, 0, 0, 0, 0, 3, 40, 0)},
