@@ -35,10 +35,10 @@ var dateLookup = map[int32]int{
 	dayDesignator:   dayIdx,
 }
 var timeLookup = map[int32]int{
-	hourDesignator:   hourIdx,
-	minuteDesignator: minuteIdx,
-	'.':              secondSepIdx,
-	secondDesignator: secondIdx,
+	hourDesignator:        hourIdx,
+	minuteDesignator:      minuteIdx,
+	secondCommaDesignator: secondSepIdx,
+	secondDesignator:      secondIdx,
 }
 
 // decimalPointMultiplier stores the pre-computed multiplier used for decimal points calculation

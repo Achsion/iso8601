@@ -12,7 +12,8 @@ const (
 	dayDesignator   = 'D'
 
 	// time
-	hourDesignator   = 'H'
-	minuteDesignator = 'M'
-	secondDesignator = 'S'
+	hourDesignator        = 'H'
+	minuteDesignator      = 'M'
+	secondDesignator      = 'S'
+	secondCommaDesignator = '.'
 )

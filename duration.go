@@ -20,7 +20,11 @@ type Duration struct {
 
 // TODO: add docu in this file
 
-func NewDuration(isPositive bool, years, months, weeks, days, hours, minutes, seconds float64) Duration {
+func NewDuration(isPositive bool, years, months, weeks, days, hours, minutes, seconds float64) (Duration, error) {
+	if years < 0 || months < 0 || weeks < 0 || days < 0 || hours < 0 || minutes < 0 || seconds < 0 {
+		return Duration{}, errors.New("all unit values must be greater than or equal to zero")
+	}
+
 	return Duration{
 		isPositive: isPositive,
 		years:      years,
@@ -30,18 +34,83 @@ func NewDuration(isPositive bool, years, months, weeks, days, hours, minutes, se
 		hours:      hours,
 		minutes:    minutes,
 		seconds:    seconds,
-	}
+	}, nil
 }
 
-func DurationFromString(durationStr string) (Duration, error) {
+//////////////////////////////////////////////////////////////////////////////////////////
+// Parsing ///////////////////////////////////////////////////////////////////////////////
+
+func DurationFromString(iso8601DurationStr string) (Duration, error) {
 	// TODO: implement this
 
 	return Duration{}, errors.New("not implemented")
 }
 
-func DurationFromTimeDuration(in time.Duration) (Duration, error) {
-	return Duration{}, errors.New("not implemented")
+func DurationFromTimeDuration(in time.Duration) Duration {
+	durVal := in.Abs()
+
+	hours := float64(durVal / time.Hour)
+	durVal = durVal % time.Hour
+
+	minutes := float64(durVal / time.Minute)
+	durVal = durVal % time.Minute
+
+	seconds := durVal.Seconds()
+
+	return Duration{
+		isPositive: in >= 0,
+		hours:      hours,
+		minutes:    minutes,
+		seconds:    seconds,
+	}
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Getter ////////////////////////////////////////////////////////////////////////////////
+
+func (d Duration) IsPositive() bool {
+	return d.isPositive
+}
+
+func (d Duration) Years() float64 {
+	return d.years
+}
+
+func (d Duration) Months() float64 {
+	return d.months
+}
+
+func (d Duration) Weeks() float64 {
+	return d.weeks
+}
+
+func (d Duration) Days() float64 {
+	return d.days
+}
+
+func (d Duration) Hours() float64 {
+	return d.hours
+}
+
+func (d Duration) Minutes() float64 {
+	return d.minutes
+}
+
+func (d Duration) Seconds() float64 {
+	return d.seconds
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Go std time stuff /////////////////////////////////////////////////////////////////////
+
+func (d Duration) AddToTime(stdTime time.Time) (time.Duration, error) {
+	// TODO: implement this
+
+	return 0, errors.New("not implemented")
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Formatting ////////////////////////////////////////////////////////////////////////////
 
 func (d Duration) String() string {
 	hasDate := false
