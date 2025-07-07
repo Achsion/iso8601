@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// Duration represents an ISO 8601 duration format. It holds all units that make up an iso8601 duration.
 type Duration struct {
 	isPositive bool
 
@@ -21,8 +22,8 @@ type Duration struct {
 	seconds float64
 }
 
-// TODO: add docu in this file
-
+// NewDuration creates a new Duration instance with the specified time units.
+// All unit values must be non-negative numbers.
 func NewDuration(isPositive bool, years, months, weeks, days, hours, minutes, seconds float64) (Duration, error) {
 	if years < 0 || months < 0 || weeks < 0 || days < 0 || hours < 0 || minutes < 0 || seconds < 0 {
 		return Duration{}, errors.New("all unit values must be greater than or equal to zero")
@@ -61,10 +62,11 @@ var durationRegex = regexp.MustCompile(
 	),
 )
 
+// DurationFromString parses an ISO 8601 duration string and creates an iso8601 Duration struct.
 func DurationFromString(iso8601DurationStr string) (Duration, error) {
 	// Implemented with regex for now, as speed should not be of major importance when using this func.
 	// If speed is crucial, `iso8601.ParseToDuration` should be used.
-	// This implementation will probably be changed to something faster but regex should suffice for now.
+	// This implementation will probably be changed to something faster, but regex should suffice for now.
 
 	matches, err := findStringCaptureGroupMatches(durationRegex, iso8601DurationStr)
 	if err != nil {
@@ -129,6 +131,7 @@ func findStringCaptureGroupMatches(
 	return result, nil
 }
 
+// DurationFromTimeDuration converts a standard Go time.Duration to an ISO 8601 Duration.
 func DurationFromTimeDuration(in time.Duration) Duration {
 	durVal := in.Abs()
 
@@ -186,6 +189,7 @@ func (d Duration) Seconds() float64 {
 //////////////////////////////////////////////////////////////////////////////////////////
 // Determination funcs ///////////////////////////////////////////////////////////////////
 
+// IsZero returns true if the Duration has a 'duration length' of zero.
 func (d Duration) IsZero() bool {
 	return d.years == 0 &&
 		d.months == 0 &&
@@ -199,6 +203,7 @@ func (d Duration) IsZero() bool {
 //////////////////////////////////////////////////////////////////////////////////////////
 // Go std time stuff /////////////////////////////////////////////////////////////////////
 
+// AddToTime adds the duration to a given time.Time value.
 func (d Duration) AddToTime(stdTime time.Time) (time.Time, error) {
 	if d.IsZero() {
 		return stdTime, nil
@@ -285,6 +290,9 @@ func float64ToInt(in float64) (int, error) {
 //////////////////////////////////////////////////////////////////////////////////////////
 // Formatting ////////////////////////////////////////////////////////////////////////////
 
+// String returns a string representing the Duration in the ISO 8601 format. Leading zero units are omitted.
+// The result counts as a valid ISO8601 duration.
+// It supports negative durations, as detailed in the extension ISO 8601-2.
 func (d Duration) String() string {
 	hasDate := false
 	hasTime := false
