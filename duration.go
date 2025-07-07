@@ -2,7 +2,9 @@ package iso8601
 
 import (
 	"errors"
+	"fmt"
 	"math"
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -41,10 +43,86 @@ func NewDuration(isPositive bool, years, months, weeks, days, hours, minutes, se
 //////////////////////////////////////////////////////////////////////////////////////////
 // Parsing ///////////////////////////////////////////////////////////////////////////////
 
-func DurationFromString(iso8601DurationStr string) (Duration, error) {
-	// TODO: implement this
+const (
+	yearsPatternKey   = "year"
+	monthsPatternKey  = "month"
+	weeksPatternKey   = "week"
+	daysPatternKey    = "day"
+	hoursPatternKey   = "hour"
+	minutesPatternKey = "minute"
+	secondsPatternKey = "second"
+)
 
-	return Duration{}, errors.New("not implemented")
+var durationRegex = regexp.MustCompile(
+	fmt.Sprintf(
+		`^P((?P<%s>[0-9.]+)Y)?((?P<%s>[0-9.]+)M)?((?P<%s>[0-9.]+)W)?((?P<%s>[0-9.]+)D)?(T((?P<%s>[0-9.]+)H)?((?P<%s>[0-9.]+)M)?((?P<%s>[\d.]+)S)?)?$`,
+		yearsPatternKey, monthsPatternKey, weeksPatternKey, daysPatternKey, hoursPatternKey, minutesPatternKey, secondsPatternKey,
+	),
+)
+
+func DurationFromString(iso8601DurationStr string) (Duration, error) {
+	// Implemented with regex for now, as speed should not be of major importance when using this func.
+	// If speed is crucial, `iso8601.ParseToDuration` should be used.
+	// This implementation will probably be changed to something faster but regex should suffice for now.
+
+	matches, err := findStringCaptureGroupMatches(durationRegex, iso8601DurationStr)
+	if err != nil {
+		return Duration{}, err
+	}
+
+	out := Duration{}
+
+	if yearStr, ok := matches[yearsPatternKey]; ok {
+		out.years = mustStringToFloat64(yearStr)
+	}
+	if monthStr, ok := matches[monthsPatternKey]; ok {
+		out.months = mustStringToFloat64(monthStr)
+	}
+	if weekStr, ok := matches[weeksPatternKey]; ok {
+		out.weeks = mustStringToFloat64(weekStr)
+	}
+	if dayStr, ok := matches[daysPatternKey]; ok {
+		out.days = mustStringToFloat64(dayStr)
+	}
+	if hourStr, ok := matches[hoursPatternKey]; ok {
+		out.hours = mustStringToFloat64(hourStr)
+	}
+	if minuteStr, ok := matches[minutesPatternKey]; ok {
+		out.minutes = mustStringToFloat64(minuteStr)
+	}
+	if secondStr, ok := matches[secondsPatternKey]; ok {
+		out.seconds = mustStringToFloat64(secondStr)
+	}
+
+	return out, nil
+}
+
+func mustStringToFloat64(in string) float64 {
+	// ignore error, as the regex ensures that the string is a valid number
+	out, _ := strconv.ParseFloat(in, 64)
+
+	return out
+}
+
+func findStringCaptureGroupMatches(
+	regex *regexp.Regexp,
+	durationStr string,
+) (map[string]string, error) {
+	captureGroups := regex.SubexpNames()
+	matches := regex.FindStringSubmatch(durationStr)
+
+	if matches == nil {
+		return nil, fmt.Errorf("could match duration string %q with regex", durationStr)
+	}
+
+	result := make(map[string]string, len(captureGroups))
+	for i, name := range captureGroups {
+		if i != 0 && name != "" && matches[i] != "" {
+			result[name] = matches[i]
+		}
+	}
+
+	return result, nil
 }
 
 func DurationFromTimeDuration(in time.Duration) Duration {
@@ -119,6 +197,7 @@ func (d Duration) AddToTime(stdTime time.Time) (time.Time, error) {
 		return time.Time{}, errors.New("could not convert month to int")
 	}
 
+	// TODO: refactor
 	weeks, decimalWeeks := math.Modf(d.weeks)
 	weekAdd, err := float64ToInt(weeks)
 	if err != nil {
