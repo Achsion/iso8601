@@ -44,19 +44,20 @@ func NewDuration(isPositive bool, years, months, weeks, days, hours, minutes, se
 // Parsing ///////////////////////////////////////////////////////////////////////////////
 
 const (
-	yearsPatternKey   = "year"
-	monthsPatternKey  = "month"
-	weeksPatternKey   = "week"
-	daysPatternKey    = "day"
-	hoursPatternKey   = "hour"
-	minutesPatternKey = "minute"
-	secondsPatternKey = "second"
+	negativePatternKey = "negative"
+	yearsPatternKey    = "year"
+	monthsPatternKey   = "month"
+	weeksPatternKey    = "week"
+	daysPatternKey     = "day"
+	hoursPatternKey    = "hour"
+	minutesPatternKey  = "minute"
+	secondsPatternKey  = "second"
 )
 
 var durationRegex = regexp.MustCompile(
 	fmt.Sprintf(
-		`^P((?P<%s>[0-9.]+)Y)?((?P<%s>[0-9.]+)M)?((?P<%s>[0-9.]+)W)?((?P<%s>[0-9.]+)D)?(T((?P<%s>[0-9.]+)H)?((?P<%s>[0-9.]+)M)?((?P<%s>[\d.]+)S)?)?$`,
-		yearsPatternKey, monthsPatternKey, weeksPatternKey, daysPatternKey, hoursPatternKey, minutesPatternKey, secondsPatternKey,
+		`^((?P<%s>\-))?P((?P<%s>[0-9.]+)Y)?((?P<%s>[0-9.]+)M)?((?P<%s>[0-9.]+)W)?((?P<%s>[0-9.]+)D)?(T((?P<%s>[0-9.]+)H)?((?P<%s>[0-9.]+)M)?((?P<%s>[\d.]+)S)?)?$`,
+		negativePatternKey, yearsPatternKey, monthsPatternKey, weeksPatternKey, daysPatternKey, hoursPatternKey, minutesPatternKey, secondsPatternKey,
 	),
 )
 
@@ -71,6 +72,9 @@ func DurationFromString(iso8601DurationStr string) (Duration, error) {
 	}
 
 	out := Duration{}
+
+	_, isNegative := matches[negativePatternKey]
+	out.isPositive = !isNegative
 
 	if yearStr, ok := matches[yearsPatternKey]; ok {
 		out.years = mustStringToFloat64(yearStr)
