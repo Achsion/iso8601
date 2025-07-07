@@ -245,6 +245,12 @@ func TestDuration_AddToTime_Success(t *testing.T) {
 			stdTime:  time.Date(2003, 3, 3, 15, 15, 15, 0, time.UTC),
 			expected: time.Date(2004, 4, 4, 18, 18, 18, 0, time.UTC),
 		},
+		{
+			name:     "with decimal point seconds",
+			dur:      newDurationT(t, true, 1, 1, 0, 1, 3, 3, 3.5),
+			stdTime:  time.Date(2003, 3, 3, 15, 15, 15, 0, time.UTC),
+			expected: time.Date(2004, 4, 4, 18, 18, 18, 500*int(time.Millisecond), time.UTC),
+		},
 	}
 
 	for _, tc := range testCases {

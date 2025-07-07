@@ -134,10 +134,16 @@ func (d Duration) AddToTime(stdTime time.Time) (time.Time, error) {
 	if err != nil {
 		return time.Time{}, errors.New("could not convert minute to int")
 	}
-	secondAdd, err := float64ToInt(d.seconds)
+
+	seconds, nanoSeconds := math.Modf(d.seconds)
+
+	secondAdd, err := float64ToInt(seconds)
 	if err != nil {
-		// TODO: should support up to nanoseconds, but not for now
 		return time.Time{}, errors.New("could not convert second to int")
+	}
+	nanoSecondAdd, err := float64ToInt(nanoSeconds * float64(time.Second))
+	if err != nil {
+		return time.Time{}, errors.New("could not convert nanosecond to int")
 	}
 
 	out := stdTime.AddDate(
@@ -147,7 +153,8 @@ func (d Duration) AddToTime(stdTime time.Time) (time.Time, error) {
 	).Add(
 		time.Hour*time.Duration(hourAdd) +
 			time.Minute*time.Duration(minuteAdd) +
-			time.Second*time.Duration(secondAdd),
+			time.Second*time.Duration(secondAdd) +
+			time.Nanosecond*time.Duration(nanoSecondAdd),
 	)
 
 	return out, nil
