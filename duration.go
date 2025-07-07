@@ -118,29 +118,37 @@ func (d Duration) AddToTime(stdTime time.Time) (time.Time, error) {
 	if err != nil {
 		return time.Time{}, errors.New("could not convert month to int")
 	}
-	weekAdd, err := float64ToInt(d.weeks)
+
+	weeks, decimalWeeks := math.Modf(d.weeks)
+	weekAdd, err := float64ToInt(weeks)
 	if err != nil {
 		return time.Time{}, errors.New("could not convert week to int")
 	}
-	dayAdd, err := float64ToInt(d.days)
+
+	days, decimalDays := math.Modf(d.days + 7*decimalWeeks)
+	dayAdd, err := float64ToInt(days)
 	if err != nil {
-		return time.Time{}, errors.New("could not convert day to int")
-	}
-	hourAdd, err := float64ToInt(d.hours)
-	if err != nil {
-		return time.Time{}, errors.New("could not convert hour to int")
-	}
-	minuteAdd, err := float64ToInt(d.minutes)
-	if err != nil {
-		return time.Time{}, errors.New("could not convert minute to int")
+		return time.Time{}, errors.New("could not convert day + remaining week to int")
 	}
 
-	seconds, nanoSeconds := math.Modf(d.seconds)
+	hours, decimalHours := math.Modf(d.hours + 24*decimalDays)
+	hourAdd, err := float64ToInt(hours)
+	if err != nil {
+		return time.Time{}, errors.New("could not convert hour + remaining day to int")
+	}
 
+	minutes, decimalMinutes := math.Modf(d.minutes + 60*decimalHours)
+	minuteAdd, err := float64ToInt(minutes)
+	if err != nil {
+		return time.Time{}, errors.New("could not convert minute + remaining hour to int")
+	}
+
+	seconds, nanoSeconds := math.Modf(d.seconds + 60*decimalMinutes)
 	secondAdd, err := float64ToInt(seconds)
 	if err != nil {
-		return time.Time{}, errors.New("could not convert second to int")
+		return time.Time{}, errors.New("could not convert second + remaining minute to int")
 	}
+
 	nanoSecondAdd, err := float64ToInt(nanoSeconds * float64(time.Second))
 	if err != nil {
 		return time.Time{}, errors.New("could not convert nanosecond to int")
