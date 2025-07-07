@@ -184,9 +184,26 @@ func (d Duration) Seconds() float64 {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// Determination funcs ///////////////////////////////////////////////////////////////////
+
+func (d Duration) IsZero() bool {
+	return d.years == 0 &&
+		d.months == 0 &&
+		d.weeks == 0 &&
+		d.days == 0 &&
+		d.hours == 0 &&
+		d.minutes == 0 &&
+		d.seconds == 0
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 // Go std time stuff /////////////////////////////////////////////////////////////////////
 
 func (d Duration) AddToTime(stdTime time.Time) (time.Time, error) {
+	if d.IsZero() {
+		return stdTime, nil
+	}
+
 	multiplier := 1
 	if !d.isPositive {
 		multiplier = -1
@@ -201,7 +218,6 @@ func (d Duration) AddToTime(stdTime time.Time) (time.Time, error) {
 		return time.Time{}, errors.New("could not convert month to int")
 	}
 
-	// TODO: refactor
 	weeks, decimalWeeks := math.Modf(d.weeks)
 	weekAdd, err := float64ToInt(weeks)
 	if err != nil {
@@ -257,11 +273,13 @@ func float64ToInt(in float64) (int, error) {
 		return 0, errors.New("float containing decimals not supported")
 	}
 
-	if intVal < math.MinInt || intVal > math.MaxInt {
+	out := int(intVal)
+
+	if (out < 0) != (intVal < 0) {
 		return 0, errors.New("float int val exceeds integer capacity")
 	}
 
-	return int(intVal * 1), nil
+	return out, nil
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

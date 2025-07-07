@@ -59,6 +59,317 @@ func TestNewDuration_Error(t *testing.T) {
 	})
 }
 
+func TestDurationFromString_Error(t *testing.T) {
+	testCases := []struct {
+		name   string
+		isoStr string
+	}{
+		{
+			name:   "missing 'P' prefix",
+			isoStr: "1Y2M3DT4H5M6S",
+		},
+		{
+			name:   "not a duration",
+			isoStr: "abc",
+		},
+		{
+			name:   "invalid designator 'G' as last designator",
+			isoStr: "P1Y2M4D1G",
+		},
+		{
+			name:   "invalid designator 'G' in the middle",
+			isoStr: "P1Y2M40G1D",
+		},
+		{
+			name:   "invalid designator 'G' as first designator",
+			isoStr: "P40G1D",
+		},
+		{
+			name:   "wrong order of designators",
+			isoStr: "PT5M4H6S",
+		},
+		{
+			name:   "string with invalid prefix",
+			isoStr: " P7Y3M4D",
+		},
+		{
+			name:   "string with suffix",
+			isoStr: "P7Y3M4D ",
+		},
+		{
+			name:   "string with number prefix",
+			isoStr: "1P7Y3M4D",
+		},
+		{
+			name:   "string with number suffix",
+			isoStr: "P7Y3M4D1",
+		},
+		{
+			name:   "double designator",
+			isoStr: "P1Y2M3DT4H3H5M6S",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, actualErr := iso8601.DurationFromString(tc.isoStr)
+			assert.Error(t, actualErr)
+		})
+	}
+}
+
+func TestDurationFromString_Success(t *testing.T) {
+	testCases := []struct {
+		isoStr   string
+		expected iso8601.Duration
+	}{
+		{
+			isoStr:   "P1Y",
+			expected: newDurationT(t, true, 1, 0, 0, 0, 0, 0, 0),
+		},
+		{
+			isoStr:   "P23Y",
+			expected: newDurationT(t, true, 23, 0, 0, 0, 0, 0, 0),
+		},
+		{
+			isoStr:   "P1.5Y",
+			expected: newDurationT(t, true, 1.5, 0, 0, 0, 0, 0, 0),
+		},
+		{
+			isoStr:   "P1M",
+			expected: newDurationT(t, true, 0, 1, 0, 0, 0, 0, 0),
+		},
+		{
+			isoStr:   "P23M",
+			expected: newDurationT(t, true, 0, 23, 0, 0, 0, 0, 0),
+		},
+		{
+			isoStr:   "P1.5M",
+			expected: newDurationT(t, true, 0, 1.5, 0, 0, 0, 0, 0),
+		},
+		{
+			isoStr:   "P1W",
+			expected: newDurationT(t, true, 0, 0, 1, 0, 0, 0, 0),
+		},
+		{
+			isoStr:   "P23W",
+			expected: newDurationT(t, true, 0, 0, 23, 0, 0, 0, 0),
+		},
+		{
+			isoStr:   "P1.5W",
+			expected: newDurationT(t, true, 0, 0, 1.5, 0, 0, 0, 0),
+		},
+		{
+			isoStr:   "P1D",
+			expected: newDurationT(t, true, 0, 0, 0, 1, 0, 0, 0),
+		},
+		{
+			isoStr:   "P23D",
+			expected: newDurationT(t, true, 0, 0, 0, 23, 0, 0, 0),
+		},
+		{
+			isoStr:   "P1.5D",
+			expected: newDurationT(t, true, 0, 0, 0, 1.5, 0, 0, 0),
+		},
+		{
+			isoStr:   "PT1H",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 1, 0, 0),
+		},
+		{
+			isoStr:   "PT23H",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 23, 0, 0),
+		},
+		{
+			isoStr:   "PT1.5H",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 1.5, 0, 0),
+		},
+		{
+			isoStr:   "PT1M",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 1, 0),
+		},
+		{
+			isoStr:   "PT23M",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 23, 0),
+		},
+		{
+			isoStr:   "PT1.5M",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 1.5, 0),
+		},
+		{
+			isoStr:   "PT1S",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 0, 1),
+		},
+		{
+			isoStr:   "PT23S",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 0, 23),
+		},
+		{
+			isoStr:   "PT1.5S",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 0, 1.5),
+		},
+		{
+			isoStr:   "PT3H40M0S",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 3, 40, 0),
+		},
+		{
+			isoStr:   "-PT3H40M0S", // negative duration, as detailed in the extension ISO8601-2
+			expected: newDurationT(t, false, 0, 0, 0, 0, 3, 40, 0),
+		},
+		{
+			isoStr:   "P1Y2M3W4DT5H6M7S",
+			expected: newDurationT(t, true, 1, 2, 3, 4, 5, 6, 7),
+		},
+		{
+			isoStr:   "PT1.23456789123S",
+			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 0, 1.23456789123),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.isoStr, func(t *testing.T) {
+			actual, err := iso8601.DurationFromString(tc.isoStr)
+			require.NoError(t, err)
+
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
+func TestDurationFromTimeDuration(t *testing.T) {
+	testCases := []struct {
+		name     string
+		in       time.Duration
+		expected iso8601.Duration
+	}{
+		{
+			name:     "zero",
+			in:       0,
+			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 0, 0),
+		},
+		{
+			name:     "1ns",
+			in:       1 * time.Nanosecond,
+			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 0, 0.000000001),
+		},
+		{
+			name:     "1s",
+			in:       1 * time.Second,
+			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 0, 1),
+		},
+		{
+			name:     "48h10m7s",
+			in:       48*time.Hour + 10*time.Minute + 7*time.Second,
+			expected: newDurationT(t, true, 0, 0, 0, 0, 48, 10, 7),
+		},
+		{
+			name:     "-48h10m7s",
+			in:       -48*time.Hour - 10*time.Minute - 7*time.Second,
+			expected: newDurationT(t, false, 0, 0, 0, 0, 48, 10, 7),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := iso8601.DurationFromTimeDuration(tc.in)
+
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
+func TestDuration_AddToTime_Error(t *testing.T) {
+	testCases := []struct {
+		name string
+		dur  iso8601.Duration
+	}{
+		{
+			name: "year too large",
+			dur:  newDurationT(t, true, 9223372036854775808, 0, 0, 0, 0, 0, 0),
+		},
+		{
+			name: "year is float",
+			dur:  newDurationT(t, true, 1.1, 0, 0, 0, 0, 0, 0),
+		},
+		{
+			name: "month is float",
+			dur:  newDurationT(t, true, 0, 1.1, 0, 0, 0, 0, 0),
+		},
+		{
+			name: "too many second decimal values",
+			dur:  newDurationT(t, true, 0, 0, 0, 0, 0, 0, 0.0000000001),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			dateTime := time.Date(2025, 7, 7, 20, 26, 24, 0, time.UTC)
+			_, actualErr := tc.dur.AddToTime(dateTime)
+			assert.Error(t, actualErr)
+		})
+	}
+}
+
+func TestDuration_AddToTime_Success(t *testing.T) {
+	testCases := []struct {
+		name     string
+		dur      iso8601.Duration
+		stdTime  time.Time
+		expected time.Time
+	}{
+		{
+			name:     "only whole numbers",
+			dur:      newDurationT(t, true, 1, 1, 0, 1, 3, 3, 3),
+			stdTime:  time.Date(2003, 3, 3, 15, 15, 15, 0, time.UTC),
+			expected: time.Date(2004, 4, 4, 18, 18, 18, 0, time.UTC),
+		},
+		{
+			name:     "with decimal point weeks",
+			dur:      newDurationT(t, true, 1, 1, 0.5, 1, 3, 3, 3),
+			stdTime:  time.Date(2003, 3, 3, 5, 15, 15, 0, time.UTC),
+			expected: time.Date(2004, 4, 7, 20, 18, 18, 0, time.UTC),
+		},
+		{
+			name:     "with decimal point days",
+			dur:      newDurationT(t, true, 1, 1, 0, 1.5, 3, 3, 3),
+			stdTime:  time.Date(2003, 3, 3, 5, 15, 15, 0, time.UTC),
+			expected: time.Date(2004, 4, 4, 20, 18, 18, 0, time.UTC),
+		},
+		{
+			name:     "with decimal point hours",
+			dur:      newDurationT(t, true, 1, 1, 0, 1, 3.5, 3, 3),
+			stdTime:  time.Date(2003, 3, 3, 15, 15, 15, 0, time.UTC),
+			expected: time.Date(2004, 4, 4, 18, 48, 18, 0, time.UTC),
+		},
+		{
+			name:     "with decimal point minutes",
+			dur:      newDurationT(t, true, 1, 1, 0, 1, 3, 3.5, 3),
+			stdTime:  time.Date(2003, 3, 3, 15, 15, 15, 0, time.UTC),
+			expected: time.Date(2004, 4, 4, 18, 18, 48, 0, time.UTC),
+		},
+		{
+			name:     "with decimal point seconds",
+			dur:      newDurationT(t, true, 1, 1, 0, 1, 3, 3, 3.5),
+			stdTime:  time.Date(2003, 3, 3, 15, 15, 15, 0, time.UTC),
+			expected: time.Date(2004, 4, 4, 18, 18, 18, 500*int(time.Millisecond), time.UTC),
+		},
+		{
+			name:     "with decimal point weeks, days, hours, minutes, seconds",
+			dur:      newDurationT(t, true, 1, 1, 0.5, 1.125, 3.5, 3.5, 3.5),
+			stdTime:  time.Date(2003, 3, 3, 2, 15, 15, 0, time.UTC),
+			expected: time.Date(2004, 4, 7, 20, 48, 48, 500*int(time.Millisecond), time.UTC),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual, actualErr := tc.dur.AddToTime(tc.stdTime)
+			require.NoError(t, actualErr)
+
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
 func TestDuration_String(t *testing.T) {
 	testCases := []struct {
 		name            string
@@ -185,79 +496,6 @@ func TestDuration_String(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			actual := tc.iso8601Duration.String()
-			assert.Equal(t, tc.expected, actual)
-		})
-	}
-}
-
-func TestDurationFromTimeDuration(t *testing.T) {
-	testCases := []struct {
-		name     string
-		in       time.Duration
-		expected iso8601.Duration
-	}{
-		{
-			name:     "zero",
-			in:       0,
-			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 0, 0),
-		},
-		{
-			name:     "1ns",
-			in:       1 * time.Nanosecond,
-			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 0, 0.000000001),
-		},
-		{
-			name:     "1s",
-			in:       1 * time.Second,
-			expected: newDurationT(t, true, 0, 0, 0, 0, 0, 0, 1),
-		},
-		{
-			name:     "48h10m7s",
-			in:       48*time.Hour + 10*time.Minute + 7*time.Second,
-			expected: newDurationT(t, true, 0, 0, 0, 0, 48, 10, 7),
-		},
-		{
-			name:     "-48h10m7s",
-			in:       -48*time.Hour - 10*time.Minute - 7*time.Second,
-			expected: newDurationT(t, false, 0, 0, 0, 0, 48, 10, 7),
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			actual := iso8601.DurationFromTimeDuration(tc.in)
-
-			assert.Equal(t, tc.expected, actual)
-		})
-	}
-}
-
-func TestDuration_AddToTime_Success(t *testing.T) {
-	testCases := []struct {
-		name     string
-		dur      iso8601.Duration
-		stdTime  time.Time
-		expected time.Time
-	}{
-		{ //TODO: test more
-			name:     "first test",
-			dur:      newDurationT(t, true, 1, 1, 0, 1, 3, 3, 3),
-			stdTime:  time.Date(2003, 3, 3, 15, 15, 15, 0, time.UTC),
-			expected: time.Date(2004, 4, 4, 18, 18, 18, 0, time.UTC),
-		},
-		{
-			name:     "with decimal point seconds",
-			dur:      newDurationT(t, true, 1, 1, 0, 1, 3, 3, 3.5),
-			stdTime:  time.Date(2003, 3, 3, 15, 15, 15, 0, time.UTC),
-			expected: time.Date(2004, 4, 4, 18, 18, 18, 500*int(time.Millisecond), time.UTC),
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			actual, actualErr := tc.dur.AddToTime(tc.stdTime)
-			require.NoError(t, actualErr)
-
 			assert.Equal(t, tc.expected, actual)
 		})
 	}
