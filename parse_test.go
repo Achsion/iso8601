@@ -160,9 +160,23 @@ func TestParseToDurationError(t *testing.T) {
 	}
 }
 
-func BenchmarkParseToDuration(b *testing.B) {
-	x := "P12Y32M153DT7H15M6.7023S"
-	for i := 0; i < b.N; i++ {
-		_, _ = iso8601.ParseToDuration(x)
+func BenchmarkParse_StdDuration(b *testing.B) {
+	cases := []struct {
+		name      string
+		isoString string
+	}{
+		{name: "zero duration", isoString: "PT0S"},
+		{name: "one second", isoString: "PT1S"},
+		{name: "3h40m", isoString: "PT3H40M"},
+		{name: "1h2m3.456s", isoString: "PT1H2M3.456S"},
+		{name: "one of everything", isoString: "P12Y32M153DT7H15M6.7023S"},
+	}
+
+	for _, benchCase := range cases {
+		b.Run(benchCase.name, func(b *testing.B) {
+			for b.Loop() {
+				_, _ = iso8601.ParseToDuration(benchCase.isoString)
+			}
+		})
 	}
 }

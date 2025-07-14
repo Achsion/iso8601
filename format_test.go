@@ -82,13 +82,14 @@ func TestFormat(t *testing.T) {
 	}
 }
 
-func BenchmarkFormat(b *testing.B) {
+func BenchmarkFormat_StdDuration(b *testing.B) {
 	cases := []struct {
 		name string
 		dur  time.Duration
 	}{
 		{name: "zero duration", dur: 0},
 		{name: "one second", dur: 1 * time.Second},
+		//{name: "1.55 second", dur: 1 * time.Second + 500*time.Millisecond}, // TODO: not yet supported
 		{name: "1 nanosecond", dur: time.Nanosecond},
 		{name: "3h40m", dur: 3*time.Hour + 40*time.Minute},
 		{name: "-3h40m", dur: -3*time.Hour - 40*time.Minute},
@@ -96,10 +97,9 @@ func BenchmarkFormat(b *testing.B) {
 		{name: "large duration", dur: time.Duration(1<<63 - 1)},
 	}
 
-	b.ResetTimer()
 	for _, benchCase := range cases {
 		b.Run(benchCase.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				_ = iso8601.Format(benchCase.dur)
 			}
 		})
