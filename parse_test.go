@@ -172,9 +172,10 @@ func BenchmarkParse_StdDuration(b *testing.B) {
 		{name: "one of everything", isoString: "P12Y32M153DT7H15M6.7023S"},
 	}
 
+	b.ResetTimer()
 	for _, benchCase := range cases {
 		b.Run(benchCase.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				_, _ = iso8601.ParseToDuration(benchCase.isoString)
 			}
 		})

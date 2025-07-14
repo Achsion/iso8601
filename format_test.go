@@ -97,9 +97,10 @@ func BenchmarkFormat_StdDuration(b *testing.B) {
 		{name: "large duration", dur: time.Duration(1<<63 - 1)},
 	}
 
+	b.ResetTimer()
 	for _, benchCase := range cases {
 		b.Run(benchCase.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				_ = iso8601.Format(benchCase.dur)
 			}
 		})

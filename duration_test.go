@@ -506,9 +506,10 @@ func BenchmarkFormat_DurationStruct(b *testing.B) {
 		{name: "one of everything", dur: newDuration(b, true, 1, 2, 3, 4, 5, 6, 7.89)},
 	}
 
+	b.ResetTimer()
 	for _, benchCase := range cases {
 		b.Run(benchCase.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				_ = benchCase.dur.String()
 			}
 		})
@@ -527,9 +528,10 @@ func BenchmarkParse_DurationStruct(b *testing.B) {
 		{name: "one of everything", isoString: "P12Y32M153DT7H15M6.7023S"},
 	}
 
+	b.ResetTimer()
 	for _, benchCase := range cases {
 		b.Run(benchCase.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				_, _ = iso8601.DurationFromString(benchCase.isoString)
 			}
 		})
