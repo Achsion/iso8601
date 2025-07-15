@@ -1,4 +1,4 @@
-module github.com/Achsion/iso8601
+module github.com/Achsion/iso8601/v2
 
 go 1.24
 
