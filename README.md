@@ -1,7 +1,7 @@
 # iso8601 Duration parser and formatter
 
-[![GoDoc](https://godoc.org/github.com/Achsion/iso8601?status.svg)](https://godoc.org/github.com/Achsion/iso8601)
-[![GoReport](https://goreportcard.com/badge/github.com/Achsion/iso8601)](https://goreportcard.com/report/github.com/Achsion/iso8601) 
+[![GoDoc](https://godoc.org/github.com/Achsion/iso8601?status.svg)](https://godoc.org/github.com/Achsion/iso8601/v2)
+[![GoReport](https://goreportcard.com/badge/github.com/Achsion/iso8601/v2)](https://goreportcard.com/report/github.com/Achsion/iso8601/v2) 
 
 The current go native `time` pkg does not support any ISO 8601 duration strings.
 
