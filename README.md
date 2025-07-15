@@ -5,17 +5,16 @@
 
 The current go native `time` pkg does not support any ISO 8601 duration strings.
 
-This library provides the functionality to parse and format a native Go `time.Duration` to and from an ISO 8601 duration string.
+This library provides the functionality to parse and format a native Go `time.Duration` to and from an ISO 8601-2 duration string.
 
-## What ISO8601 duration strings are supported?
+## What is still missing?
 
-Currently, fast parsing (`ParseToDuration`) only supports ISO 8601-1.  
-However, every other part of the library already works with the ISO 8601-2 extension in mind.
+Currently, fast formatting (`Format`) does not support duration parts smaller than one second.
 
 ## Installation
 
 ```bash
-go get github.com/Achsion/iso8601
+go get github.com/Achsion/iso8601/v2
 ```
 
 will resolve and add the package to the current development module, along with its dependencies.

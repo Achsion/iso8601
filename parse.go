@@ -51,7 +51,7 @@ var invalidFormatErr = fmt.Errorf("invalid iso8601 duration format")
 // ParseToDuration is a fast func that parses an ISO 8601 duration string into a time.Duration.
 // It accepts negative durations but only by prepending a '-' like: "[-]P<duration>".
 //
-// It is very inaccurate for parsing durations with larger parts, than a day and does not support weeks.
+// It is very inaccurate for parsing durations with larger parts than a day and does not support weeks.
 // Use DurationFromString if you need to handle those.
 func ParseToDuration(durationString string) (time.Duration, error) {
 	isNegative := false
