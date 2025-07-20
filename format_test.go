@@ -1,7 +1,7 @@
 package iso8601_test
 
 import (
-	"github.com/Achsion/iso8601"
+	"github.com/Achsion/iso8601/v2"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
